@@ -254,3 +254,17 @@ button.secondary:active { box-shadow: 0 2px 0 #3d1a8a; }
   .title-hero { height: 90px; }
   .how-list li { margin: 3px 0; font-size: 15px; }
 }
+
+/* small phones (iPhone SE): fit the character maker on one screen */
+@media (max-height: 700px) {
+  #creator { gap: 6px; }
+  #creator h2 { font-size: 26px; }
+  .hero-preview { width: 110px; height: 120px; }
+  #heroName { font-size: 18px; padding: 6px 12px; }
+  .opt { gap: 8px; }
+  .opt > span { width: 56px; font-size: 14px; }
+  .choices { gap: 5px; flex-wrap: nowrap; }
+  .choice { width: 36px; height: 36px; font-size: 20px; border-width: 2px; }
+  .choice.word { font-size: 14px; padding: 0 9px; }
+  #creatorDone { font-size: 20px; padding: 10px 30px; }
+}
