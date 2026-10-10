@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Graveyard Escape">
+  <meta name="theme-color" content="#120a1f">
+  <title>Graveyard Escape</title>
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" href="icons/icon-180.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="sat"></div>
+
+  <!-- in-game display -->
+  <div id="hud" class="hidden">
+    <span id="hearts" class="pill"></span>
+    <span class="pill"><span id="keys"></span>&nbsp;&nbsp;<span id="candy"></span></span>
+    <button id="pauseBtn" class="icon-btn" aria-label="Pause">⏸</button>
+  </div>
+  <div id="controls" class="hidden">
+    <button id="hideBtn" class="ctl hidden">🙈<br>HIDE</button>
+    <button id="throwBtn" class="ctl">🪨<br><span id="pebbleCount">2</span></button>
+    <button id="sprintBtn" class="ctl">⚡<br>SPRINT</button>
+  </div>
+  <div id="toast" class="hidden"></div>
+
+  <!-- title -->
+  <section id="title" class="screen">
+    <div class="moon"></div>
+    <h1>Graveyard<br>Escape</h1>
+    <canvas id="titleHero" class="title-hero"></canvas>
+    <p class="tagline">Run! Dodge! Hide!</p>
+    <button id="playBtn" class="big">▶ Play</button>
+    <div class="row">
+      <button id="dressBtn" class="secondary">👗 My Character</button>
+      <button id="howBtn" class="secondary">❓ How to Play</button>
+    </div>
+    <button id="soundBtn" class="icon-btn corner" aria-label="Sound">🔊</button>
+  </section>
+
+  <!-- character maker -->
+  <section id="creator" class="screen hidden">
+    <h2>Make Your Character</h2>
+    <canvas id="heroPreview" class="hero-preview"></canvas>
+    <input id="heroName" maxlength="12" placeholder="Type your name" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false">
+    <div class="opt"><span>Costume</span><div id="optCostume" class="choices"></div></div>
+    <div class="opt"><span>Hair</span><div id="optHair" class="choices"></div></div>
+    <div class="opt"><span>Style</span><div id="optStyle" class="choices"></div></div>
+    <div class="opt"><span>Skin</span><div id="optSkin" class="choices"></div></div>
+    <div class="opt"><span>Outfit</span><div id="optOutfit" class="choices"></div></div>
+    <button id="creatorDone" class="big">✓ Done</button>
+  </section>
+
+  <!-- level select -->
+  <section id="levels" class="screen hidden">
+    <h2>Pick a Graveyard</h2>
+    <div id="levelList" class="level-list"></div>
+    <button id="levelsBack" class="secondary">← Back</button>
+  </section>
+
+  <!-- how to play -->
+  <section id="how" class="screen hidden">
+    <h2>How to Play</h2>
+    <ul class="how-list">
+      <li><b>👆</b> Drag to move. A <b>small</b> drag sneaks quietly 🤫, a <b>big</b> drag runs</li>
+      <li><b>⚡</b> Hold SPRINT to run really fast, until you're out of breath</li>
+      <li><b>👁️</b> Ghosts see inside their cone of light. Walls and tombstones block it</li>
+      <li><b>❓</b> When a ghost notices you, its <b>?</b> fills up. Full means it chases you <b class="red">!</b></li>
+      <li><b>🔊</b> Running makes noise and sprinting makes lots. Ghosts come to check noises</li>
+      <li><b>🙈</b> Hide in bushes, coffins and crypts, but a ghost that <b>sees</b> you hide will find you</li>
+      <li><b>🪨</b> THROW a pebble to make a noise and send ghosts the wrong way</li>
+      <li><b>😱</b> Banshees are blind but hear everything, and scream for the ghosts</li>
+      <li><b>🌫️</b> Phantoms float through walls and sense you nearby. They're slow, so keep moving</li>
+      <li><b>🗺️</b> Your map (top right) shows where you've been. Tap it to make it bigger</li>
+      <li><b>⭐</b> Stars: escape · get all the candy · never get spotted</li>
+      <li class="keys-help"><b>⌨️</b> Computer: arrows/WASD · hold X sneak · Shift sprint · Space hide · F throw · M map</li>
+    </ul>
+    <button id="howBack" class="big">Got it!</button>
+  </section>
+
+  <!-- level intro -->
+  <section id="intro" class="screen hidden">
+    <p id="introNum" class="level-num">Level 1</p>
+    <h2 id="introName"></h2>
+    <p id="introGoal" class="goal"></p>
+    <p id="introVillain" class="villain"></p>
+    <p id="introTip" class="tip"></p>
+    <p id="introBest" class="best"></p>
+    <p id="introWarn" class="warn hidden"></p>
+    <button id="introGo" class="big">Let's go!</button>
+  </section>
+
+  <!-- pause -->
+  <section id="pause" class="screen hidden">
+    <h2>Paused</h2>
+    <button id="resumeBtn" class="big">▶ Keep Playing</button>
+    <button id="restartBtn" class="secondary">↻ Start Level Again</button>
+    <button id="pauseSoundBtn" class="secondary">🔊 Sound: on</button>
+    <button id="quitBtn" class="secondary">🏠 Menu</button>
+  </section>
+
+  <!-- win -->
+  <section id="win" class="screen hidden">
+    <div id="rain" class="rain"></div>
+    <h2 id="winTitle">You escaped!</h2>
+    <div id="winStars" class="stars"></div>
+    <p id="winStats"></p>
+    <button id="nextBtn" class="big">Next Level ▶</button>
+    <button id="replayBtn" class="secondary">↻ Play Again</button>
+    <button id="winMenuBtn" class="secondary">🏠 Menu</button>
+  </section>
+
+  <!-- caught -->
+  <section id="lose" class="screen hidden">
+    <h2>Oh no! 👻</h2>
+    <p id="loseText"></p>
+    <button id="retryBtn" class="big">↻ Try Again</button>
+    <button id="loseMenuBtn" class="secondary">🏠 Menu</button>
+  </section>
+
+  <script src="js/levels.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
