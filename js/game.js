@@ -99,6 +99,7 @@
   const cam = { x: 0, y: 0 };
   let shakeT = 0, flashT = 0, caughtT = 0;
   let miniDirty = true, miniBig = false, miniRect = null;
+  let lastOffset = [0, 0];
   const particles = [];
   const tipsShown = new Set();
   let MP = null;                 // multiplayer session (null = playing alone)
@@ -1136,10 +1137,16 @@
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     if (!L) return;
     const halfW = W / 2 / TS, halfH = H / 2 / TS, top = TOP / TS;
-    const cx = L.w <= halfW * 2 ? L.w / 2 : clamp(cam.x, halfW, L.w - halfW);
-    const cy = L.h + top <= halfH * 2 ? (L.h - top) / 2 : clamp(cam.y, halfH - top, L.h - halfH);
+    // While playing, the camera may scroll a little past the right and bottom edges of the map,
+    // so nothing in those corners (you, the gate, a key) ends up hidden under the buttons.
+    const playing = P && !L.demo;
+    const padR = playing ? 150 / TS : 0, padB = playing ? 140 / TS : 0;
+    const fit = (v, lo, hi) => (hi < lo ? (lo + hi) / 2 : clamp(v, lo, hi));
+    const cx = fit(cam.x, halfW, L.w - halfW + padR);
+    const cy = fit(cam.y, halfH - top, L.h - halfH + padB);
     let ox = canvas.width / 2 - cx * SC, oy = canvas.height / 2 - cy * SC;
     if (shakeT > 0) { ox += (Math.random() - 0.5) * 30 * DPR * shakeT; oy += (Math.random() - 0.5) * 30 * DPR * shakeT; }
+    lastOffset = [ox, oy];
 
     ctx.setTransform(SC, 0, 0, SC, ox, oy);
     ctx.drawImage(mapCanvas, 0, 0, L.w, L.h);
@@ -2529,5 +2536,6 @@
     get miniBig() { return miniBig; }, get miniRect() { return miniRect; }, get screen() { return screen; }, remotes, input,
     startLevel, beginPlay, toggleHide, throwPebble, validateLevel, isSolid, findPath, ghostSees, useAbility, ghostCheck,
     sendEmote, iSee: (h) => iSee(h),
+    toScreen: (x, y) => [(x * SC + lastOffset[0]) / DPR, (y * SC + lastOffset[1]) / DPR],
   };
 })();

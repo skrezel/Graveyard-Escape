@@ -316,3 +316,10 @@ details.rules ul, .rules-list { padding-left: 20px; margin: 8px 0 0; font-size: 
 #emotes .emote { position: static; width: 50px; height: 50px; font-size: 26px; background: rgba(255, 255, 255, 0.95); box-shadow: 0 3px 0 rgba(0, 0, 0, 0.4); }
 #clock { font-variant-numeric: tabular-nums; }
 .choice.word.swatch { width: 40px; height: 40px; padding: 0; border-radius: 50%; }
+
+/* short landscape screens: the buttons go in one row along the bottom, so they don't cover the map */
+@media (max-height: 500px) and (orientation: landscape) {
+  #hideBtn { right: calc(204px + env(safe-area-inset-right)); bottom: calc(24px + env(safe-area-inset-bottom)); width: 80px; height: 80px; font-size: 16px; }
+  #emoteBtn { right: calc(296px + env(safe-area-inset-right)); bottom: calc(30px + env(safe-area-inset-bottom)); }
+  #emotes { right: calc(296px + env(safe-area-inset-right)); bottom: calc(90px + env(safe-area-inset-bottom)); }
+}
