@@ -1,0 +1,14 @@
+# Graveyard Escape multiplayer relay (Cloudflare Worker + Durable Objects).
+# Each room code gets its own Durable Object that forwards messages between the
+# players' phones. The game itself runs on the host's phone.
+name = "graveyard-escape"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "Room"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Room"]

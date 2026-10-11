@@ -7,16 +7,40 @@ const Art = (() => {
   'use strict';
 
   // ---------- character choices ----------
-  const SKINS = ['#ffe0c4', '#f1c48f', '#c68642', '#8d5524'];
-  const HAIRS = ['#6b3e26', '#231c28', '#f2cb5e', '#d2622f', '#ff7ab8', '#9b5cff'];
-  const OUTFITS = ['#8a4dff', '#ff7f1f', '#2fbf71', '#ff5fa2', '#3d8bff', '#e0323a'];
-  const HAIR_STYLES = ['long', 'pigtails', 'short'];
+  // New options are always added at the END of a list, so saved characters keep their look.
+  const SKINS = ['#ffe0c4', '#f1c48f', '#c68642', '#8d5524', '#fde9db'];
+  const HAIRS = ['#6b3e26', '#231c28', '#f2cb5e', '#d2622f', '#ff7ab8', '#9b5cff',
+    '#a9824f', '#4a2e1f', '#8f8f94', '#efe0b0', '#b5532a', '#7a5a42'];
+  const OUTFITS = ['#8a4dff', '#ff7f1f', '#2fbf71', '#ff5fa2', '#3d8bff', '#e0323a',
+    '#1f2a4d', '#f1efe9', '#1c1a22', '#a38f78', '#43464f', '#4f6b2e'];
+  const BOTTOMS = ['#2f4778', '#1c1a22', '#55575e', '#1f2a4d', '#a38f78'];   // jeans, black, grey, navy, beige
+  const TIES = [null, '#c0623a', '#7a1e2b', '#1f2a4d', '#d8b24a'];          // none, copper, burgundy, navy, gold
+  const EYES = ['#3b2a20', '#3f78c8', '#3c8a52', '#6f7f8f'];                // brown, blue, green, grey
+  const NECKLACES = [null, '#e8c14d', '#c9ccd4'];                            // none, gold, silver
+  const HAIR_STYLES = ['long', 'pigtails', 'short', 'ponytail', 'bun', 'curly', 'bob', 'messy', 'neat', 'receding'];
+  const HAIR_LABELS = { long: 'Long', pigtails: 'Pigtails', short: 'Short', ponytail: 'Ponytail', bun: 'Bun', curly: 'Curly', bob: 'Bob', messy: 'Messy', neat: 'Neat', receding: 'Thin on top' };
+  const BODIES = [
+    { id: 'dress', label: 'Dress' }, { id: 'casual', label: 'Jumper & trousers' },
+    { id: 'suit', label: 'Suit' }, { id: 'waistcoat', label: 'Waistcoat' },
+  ];
+  const PATTERNS = [
+    { id: 'none', label: 'Plain' }, { id: 'flowers', label: 'Flowers' }, { id: 'check', label: 'Check' },
+    { id: 'lace', label: 'Lace' }, { id: 'knit', label: 'Knitted' },
+  ];
+  const GLASSES = [
+    { id: 'none', label: 'None' }, { id: 'round', label: 'Round' }, { id: 'oval', label: 'Oval' },
+    { id: 'square', label: 'Square' }, { id: 'sporty', label: 'Red arms' }, { id: 'chunky', label: 'Chunky' },
+    { id: 'shades', label: 'Sunglasses' },
+  ];
+  const BEARDS = [{ id: 'none', label: 'None' }, { id: 'stubble', label: 'Stubble' }, { id: 'goatee', label: 'Goatee' }, { id: 'full', label: 'Big beard' }];
+  const HATS = [{ id: 'none', label: 'None' }, { id: 'cap', label: 'Flat cap' }, { id: 'flowers', label: 'Flower crown' }];
   const COSTUMES = [
     { id: 'witch', label: 'Witch', icon: '🧙‍♀️' },
     { id: 'cat', label: 'Cat', icon: '🐱' },
     { id: 'princess', label: 'Princess', icon: '👑' },
     { id: 'vampire', label: 'Vampire', icon: '🧛‍♀️' },
     { id: 'fairy', label: 'Fairy', icon: '🧚‍♀️' },
+    { id: 'none', label: 'No costume', icon: '🙂' },
   ];
   const FONT = '"Chalkboard SE", "Comic Sans MS", "Trebuchet MS", sans-serif';
   const TAU = Math.PI * 2;
@@ -81,23 +105,37 @@ const Art = (() => {
   // =====================================================================
   //  THE HERO (that's you!)
   // =====================================================================
+  const choose = (arr, i, d) => (i != null && arr[i] !== undefined ? arr[i] : d);
   function resolveHero(h) {
+    const hair = choose(HAIRS, h.hair, HAIRS[0]);
     return {
-      skin: SKINS[h.skin] || SKINS[0],
-      hair: HAIRS[h.hair] || HAIRS[0],
-      style: HAIR_STYLES[h.hairStyle] || 'long',
-      outfit: OUTFITS[h.outfit] || OUTFITS[0],
-      costume: (COSTUMES[h.costume] || COSTUMES[0]).id,
+      skin: choose(SKINS, h.skin, SKINS[0]),
+      hair,
+      style: choose(HAIR_STYLES, h.hairStyle, 'long'),
+      outfit: choose(OUTFITS, h.outfit, OUTFITS[0]),
+      costume: choose(COSTUMES, h.costume, COSTUMES[0]).id,
+      body: choose(BODIES, h.body, BODIES[0]).id,
+      bottom: choose(BOTTOMS, h.bottom, BOTTOMS[0]),
+      tie: choose(TIES, h.tie, null),
+      pattern: choose(PATTERNS, h.pattern, PATTERNS[0]).id,
+      eyes: choose(EYES, h.eyes, EYES[0]),
+      glasses: choose(GLASSES, h.glasses, GLASSES[0]).id,
+      beard: choose(BEARDS, h.beard, BEARDS[0]).id,
+      beardColor: choose(HAIRS, h.beardColor, hair),
+      hat: choose(HATS, h.hat, HATS[0]).id,
+      necklace: choose(NECKLACES, h.necklace, null),
     };
   }
+  function isLight(hex) { const [r, g, b] = rgb(hex); return r * 0.3 + g * 0.59 + b * 0.11 > 170; }
 
-  // x, y = where her feet are. o = { t, walk, moving, flip, back, side, scared, dizzy, scale }
+  // x, y = where the feet are. o = { t, walk, moving, flip, back, side, scared, dizzy, sneak, tired, scale }
   function hero(c, x, y, h, o = {}) {
     const k = resolveHero(h);
     const t = o.t || 0;
     const moving = !!o.moving;
     const sw = moving ? Math.sin(o.walk || 0) : 0;
     const bob = moving ? -Math.abs(Math.sin(o.walk || 0)) * 0.045 : Math.sin(t * 2.5) * 0.008;
+    const trousers = k.body !== 'dress';
     c.save();
     c.translate(x, y);
     if (o.scale) c.scale(o.scale, o.scale);
@@ -106,10 +144,11 @@ const Art = (() => {
     if (o.flip) c.scale(-1, 1);
     if (o.sneak) { c.translate(0, 0.03); c.scale(1.04, 0.9); }   // crouching while sneaking
 
-    // legs and shoes
-    c.fillStyle = '#3a2a4a';
-    rrect(c, -0.1, 0.1 + sw * 0.04, 0.07, 0.18, 0.03); c.fill();
-    rrect(c, 0.03, 0.1 - sw * 0.04, 0.07, 0.18, 0.03); c.fill();
+    // legs (tights or trousers) and shoes
+    c.fillStyle = trousers ? k.bottom : (k.costume === 'vampire' ? '#1b1522' : '#3a2a4a');
+    const lw = trousers ? 0.09 : 0.07, top = trousers ? 0.06 : 0.1;
+    rrect(c, trousers ? -0.11 : -0.1, top + sw * 0.04, lw, 0.28 - top, 0.03); c.fill();
+    rrect(c, trousers ? 0.02 : 0.03, top - sw * 0.04, lw, 0.28 - top, 0.03); c.fill();
     c.fillStyle = '#120d18';
     ell(c, -0.065, 0.285 + sw * 0.04, 0.055, 0.032); c.fill();
     ell(c, 0.065, 0.285 - sw * 0.04, 0.055, 0.032); c.fill();
@@ -119,11 +158,11 @@ const Art = (() => {
     if (k.costume === 'vampire') vampireCape(c, sw);
     if (k.costume === 'cat') catTail(c, t);
     if (!o.back) hairBack(c, k);
-    dress(c, k);
+    outfit(c, k);
 
     // arms
     const as = moving ? Math.sin(o.walk || 0) * 0.05 : 0;
-    c.fillStyle = k.outfit;
+    c.fillStyle = k.body === 'waistcoat' ? '#f4f2ee' : k.outfit;
     ell(c, -0.14, -0.08, 0.06, 0.05); c.fill();
     ell(c, 0.14, -0.08, 0.06, 0.05); c.fill();
     c.fillStyle = k.skin;
@@ -133,9 +172,17 @@ const Art = (() => {
     // head
     c.fillStyle = k.skin;
     circ(c, 0, -0.35, 0.22); c.fill();
+    const fx = o.side ? 0.05 : 0;
     if (o.back) hairFromBehind(c, k);
-    else { face(c, k, o); fringe(c, k); }
+    else {
+      eyes(c, k, o, fx);
+      beard(c, k, fx);
+      mouth(c, k, o, fx);
+      fringe(c, k);
+      glasses(c, k, fx);
+    }
     headwear(c, k);
+    hat(c, k);
     if (o.dizzy) dizzyStars(c, t);
     if (o.tired) {   // a drop of sweat
       c.fillStyle = '#8fd3ff';
@@ -144,6 +191,11 @@ const Art = (() => {
     c.restore();
   }
 
+  // ---------- hair ----------
+  const CURLS_BACK = [[-0.3, -0.46, 0.11], [-0.34, -0.31, 0.11], [-0.35, -0.16, 0.11], [-0.31, -0.02, 0.1], [-0.22, 0.06, 0.09],
+    [0.3, -0.46, 0.11], [0.34, -0.31, 0.11], [0.35, -0.16, 0.11], [0.31, -0.02, 0.1], [0.22, 0.06, 0.09],
+    [-0.17, -0.58, 0.11], [0, -0.62, 0.11], [0.17, -0.58, 0.11]];
+  const CURLS_FRONT = [[-0.18, -0.5, 0.075], [-0.07, -0.56, 0.08], [0.06, -0.56, 0.08], [0.18, -0.5, 0.075], [-0.225, -0.39, 0.06], [0.225, -0.39, 0.06]];
   function pigtails(c, k) {
     c.fillStyle = k.hair;
     circ(c, -0.27, -0.27, 0.095); c.fill();
@@ -154,51 +206,133 @@ const Art = (() => {
     circ(c, -0.22, -0.33, 0.035); c.fill();
     circ(c, 0.22, -0.33, 0.035); c.fill();
   }
+  function curls(c, k, list) {
+    c.fillStyle = shade(k.hair, -0.25);
+    for (const [x, y, r] of list) { circ(c, x + 0.01, y + 0.01, r); c.fill(); }
+    c.fillStyle = k.hair;
+    for (const [x, y, r] of list) { circ(c, x, y, r * 0.92); c.fill(); }
+  }
   function hairBack(c, k) {
     c.fillStyle = k.hair;
-    if (k.style === 'long') { rrect(c, -0.25, -0.5, 0.5, 0.5, 0.16); c.fill(); }
-    else if (k.style === 'pigtails') pigtails(c, k);
-    else { ell(c, 0, -0.33, 0.245, 0.2); c.fill(); }
+    switch (k.style) {
+      case 'long': rrect(c, -0.25, -0.5, 0.5, 0.5, 0.16); c.fill(); break;
+      case 'pigtails': pigtails(c, k); break;
+      case 'ponytail':
+        ell(c, 0, -0.38, 0.24, 0.2); c.fill();
+        ell(c, 0.25, -0.25, 0.065, 0.15, 0.35); c.fill();
+        break;
+      case 'curly': curls(c, k, CURLS_BACK); break;
+      case 'bob':
+        rrect(c, -0.27, -0.52, 0.54, 0.38, 0.15); c.fill();
+        for (let i = 0; i < 6; i++) { circ(c, -0.25 + i * 0.1, -0.15, 0.055); c.fill(); }
+        break;
+      default: ell(c, 0, -0.34, 0.24, 0.19); c.fill();
+    }
   }
   function hairFromBehind(c, k) {
     c.fillStyle = k.hair;
+    if (k.style === 'curly') { curls(c, k, CURLS_BACK); return; }
+    if (k.style === 'receding') { ell(c, 0, -0.33, 0.235, 0.17); c.fill(); return; }
     circ(c, 0, -0.36, 0.235); c.fill();
     if (k.style === 'long') { rrect(c, -0.24, -0.4, 0.48, 0.42, 0.14); c.fill(); }
     if (k.style === 'pigtails') pigtails(c, k);
+    if (k.style === 'ponytail') { ell(c, 0, -0.2, 0.07, 0.16); c.fill(); }
+    if (k.style === 'bun') { circ(c, 0, -0.58, 0.095); c.fill(); }
+    if (k.style === 'bob') { rrect(c, -0.26, -0.45, 0.52, 0.3, 0.14); c.fill(); }
   }
   function fringe(c, k) {
     c.fillStyle = k.hair;
-    c.beginPath();
-    c.ellipse(0, -0.42, 0.245, 0.17, 0, Math.PI, 0);
-    c.quadraticCurveTo(0.17, -0.35, 0.1, -0.4);
-    c.quadraticCurveTo(0.03, -0.34, -0.04, -0.4);
-    c.quadraticCurveTo(-0.12, -0.34, -0.2, -0.38);
-    c.quadraticCurveTo(-0.24, -0.38, -0.245, -0.42);
-    c.fill();
+    switch (k.style) {
+      case 'receding':
+        ell(c, -0.215, -0.37, 0.045, 0.085); c.fill();
+        ell(c, 0.215, -0.37, 0.045, 0.085); c.fill();
+        c.globalAlpha = 0.35; ell(c, 0, -0.555, 0.13, 0.035); c.fill(); c.globalAlpha = 1;
+        break;
+      case 'ponytail':
+      case 'bun':
+        c.beginPath();
+        c.ellipse(0, -0.43, 0.24, 0.155, 0, Math.PI, 0);
+        c.quadraticCurveTo(0, -0.5, -0.24, -0.43);
+        c.fill();
+        c.strokeStyle = k.hair; c.lineWidth = 0.012;
+        c.beginPath();
+        c.moveTo(-0.2, -0.45); c.quadraticCurveTo(-0.26, -0.33, -0.21, -0.22);
+        c.moveTo(0.2, -0.45); c.quadraticCurveTo(0.26, -0.33, 0.21, -0.22);
+        c.stroke();
+        if (k.style === 'bun') { circ(c, 0, -0.6, 0.095); c.fill(); c.strokeStyle = shade(k.hair, -0.25); c.lineWidth = 0.012; c.stroke(); }
+        break;
+      case 'curly': curls(c, k, CURLS_FRONT); break;
+      case 'bob':
+        c.beginPath();
+        c.ellipse(0, -0.42, 0.25, 0.17, 0, Math.PI, 0);
+        c.quadraticCurveTo(0.1, -0.43, -0.06, -0.36);
+        c.quadraticCurveTo(-0.18, -0.33, -0.25, -0.42);
+        c.fill();
+        ell(c, -0.235, -0.3, 0.05, 0.12); c.fill();
+        ell(c, 0.235, -0.3, 0.05, 0.12); c.fill();
+        break;
+      case 'messy':
+        c.beginPath();
+        c.ellipse(0, -0.43, 0.245, 0.16, 0, Math.PI, 0);
+        c.lineTo(0.18, -0.39); c.lineTo(0.1, -0.36); c.lineTo(0.06, -0.4); c.lineTo(-0.02, -0.35);
+        c.lineTo(-0.07, -0.41); c.lineTo(-0.15, -0.37); c.lineTo(-0.245, -0.43);
+        c.fill();
+        tri(c, -0.1, -0.57, -0.04, -0.66, 0.0, -0.57);
+        tri(c, 0.02, -0.58, 0.1, -0.65, 0.12, -0.55);
+        tri(c, -0.19, -0.53, -0.17, -0.62, -0.09, -0.57);
+        break;
+      case 'neat':
+        c.beginPath();
+        c.ellipse(0, -0.43, 0.245, 0.16, 0, Math.PI, 0);
+        c.quadraticCurveTo(0.05, -0.46, -0.08, -0.43);
+        c.quadraticCurveTo(-0.17, -0.4, -0.245, -0.43);
+        c.fill();
+        c.strokeStyle = shade(k.hair, -0.3); c.lineWidth = 0.01;
+        c.beginPath(); c.moveTo(-0.08, -0.58); c.quadraticCurveTo(-0.09, -0.5, -0.08, -0.44); c.stroke();
+        break;
+      default:   // long, pigtails, short: bangs
+        c.beginPath();
+        c.ellipse(0, -0.42, 0.245, 0.17, 0, Math.PI, 0);
+        c.quadraticCurveTo(0.17, -0.35, 0.1, -0.4);
+        c.quadraticCurveTo(0.03, -0.34, -0.04, -0.4);
+        c.quadraticCurveTo(-0.12, -0.34, -0.2, -0.38);
+        c.quadraticCurveTo(-0.24, -0.38, -0.245, -0.42);
+        c.fill();
+    }
   }
-  function face(c, k, o) {
-    const fx = o.side ? 0.05 : 0;
+
+  // ---------- face ----------
+  function eyes(c, k, o, fx) {
     const scared = !!o.scared;
     const blink = !scared && ((o.t || 0) % 3.2) < 0.12;
-    for (const ex of [-0.08, 0.08]) {
-      if (blink) {
-        c.strokeStyle = '#1b1325'; c.lineWidth = 0.02;
-        c.beginPath(); c.moveTo(fx + ex - 0.03, -0.33); c.lineTo(fx + ex + 0.03, -0.33); c.stroke();
-      } else if (scared) {
-        c.fillStyle = '#fff'; ell(c, fx + ex, -0.33, 0.045, 0.055); c.fill();
-        c.fillStyle = '#1b1325'; circ(c, fx + ex + 0.01, -0.33, 0.023); c.fill();
-      } else {
-        c.fillStyle = '#1b1325'; ell(c, fx + ex, -0.33, 0.034, 0.048); c.fill();
-        c.fillStyle = '#fff'; circ(c, fx + ex + 0.012, -0.345, 0.012); c.fill();
+    if (k.glasses !== 'shades') {
+      for (const ex of [-0.08, 0.08]) {
+        if (blink) {
+          c.strokeStyle = '#1b1325'; c.lineWidth = 0.02;
+          c.beginPath(); c.moveTo(fx + ex - 0.03, -0.33); c.lineTo(fx + ex + 0.03, -0.33); c.stroke();
+        } else if (scared) {
+          c.fillStyle = '#fff'; ell(c, fx + ex, -0.33, 0.045, 0.055); c.fill();
+          c.fillStyle = k.eyes; circ(c, fx + ex + 0.01, -0.33, 0.026); c.fill();
+          c.fillStyle = '#120c18'; circ(c, fx + ex + 0.01, -0.33, 0.014); c.fill();
+        } else {
+          c.fillStyle = k.eyes; ell(c, fx + ex, -0.33, 0.034, 0.048); c.fill();
+          c.fillStyle = '#120c18'; ell(c, fx + ex, -0.325, 0.02, 0.03); c.fill();
+          c.fillStyle = '#fff'; circ(c, fx + ex + 0.012, -0.345, 0.012); c.fill();
+        }
       }
     }
-    c.fillStyle = 'rgba(255,110,140,0.35)';
-    ell(c, fx - 0.14, -0.27, 0.04, 0.025); c.fill();
-    ell(c, fx + 0.14, -0.27, 0.04, 0.025); c.fill();
+    if (k.beard !== 'full') {
+      c.fillStyle = 'rgba(255,110,140,0.35)';
+      ell(c, fx - 0.14, -0.27, 0.04, 0.025); c.fill();
+      ell(c, fx + 0.14, -0.27, 0.04, 0.025); c.fill();
+    }
+  }
+  function mouth(c, k, o, fx) {
+    const scared = !!o.scared;
     if (scared) {
       c.fillStyle = '#5a1a2a'; ell(c, fx, -0.245, 0.028, 0.035); c.fill();
     } else {
-      c.strokeStyle = '#5a1a2a'; c.lineWidth = 0.018; c.lineCap = 'round';
+      c.strokeStyle = k.beard === 'full' ? '#5a2018' : '#5a1a2a'; c.lineWidth = 0.018; c.lineCap = 'round';
       c.beginPath(); c.arc(fx, -0.275, 0.04, 0.25, Math.PI - 0.25); c.stroke();
     }
     if (k.costume === 'vampire' && !scared) {
@@ -218,16 +352,194 @@ const Art = (() => {
       }
     }
   }
-  function dress(c, k) {
-    c.fillStyle = k.outfit;
+  function beardPath(c, bottom) {
     c.beginPath();
-    c.moveTo(-0.12, -0.14); c.lineTo(0.12, -0.14);
-    c.quadraticCurveTo(0.16, 0, 0.21, 0.15);
-    c.quadraticCurveTo(0, 0.21, -0.21, 0.15);
-    c.quadraticCurveTo(-0.16, 0, -0.12, -0.14);
-    c.fill();
-    c.strokeStyle = shade(k.outfit, -0.35); c.lineWidth = 0.025;
-    c.beginPath(); c.moveTo(0.205, 0.145); c.quadraticCurveTo(0, 0.205, -0.205, 0.145); c.stroke();
+    c.moveTo(-0.215, -0.36);
+    c.quadraticCurveTo(-0.25, bottom - 0.1, 0, bottom);
+    c.quadraticCurveTo(0.25, bottom - 0.1, 0.215, -0.36);
+    c.quadraticCurveTo(0.17, -0.27, 0.09, -0.29);
+    c.quadraticCurveTo(0, -0.3, -0.09, -0.29);
+    c.quadraticCurveTo(-0.17, -0.27, -0.215, -0.36);
+    c.closePath();
+  }
+  function moustache(c, col) {
+    c.fillStyle = col;
+    ell(c, -0.05, -0.282, 0.062, 0.026, 0.25); c.fill();
+    ell(c, 0.05, -0.282, 0.062, 0.026, -0.25); c.fill();
+  }
+  function beard(c, k, fx) {
+    if (k.beard === 'none') return;
+    const b = k.beardColor;
+    c.save();
+    c.translate(fx * 0.6, 0);
+    if (k.beard === 'full') {
+      c.fillStyle = b; beardPath(c, 0.02); c.fill();
+      c.strokeStyle = shade(b, -0.28); c.lineWidth = 0.01;
+      c.beginPath();
+      for (const [x0, y0, x1, y1] of [[-0.16, -0.24, -0.12, -0.08], [0.15, -0.22, 0.1, -0.06], [-0.05, -0.17, -0.04, -0.02]]) { c.moveTo(x0, y0); c.quadraticCurveTo(x0 + 0.03, (y0 + y1) / 2, x1, y1); }
+      c.stroke();
+      c.strokeStyle = 'rgba(232,226,214,0.6)'; c.lineWidth = 0.012;   // a few grey streaks
+      c.beginPath();
+      for (const [x0, y0, x1, y1] of [[-0.11, -0.2, -0.07, -0.04], [0.1, -0.19, 0.06, -0.03], [0.02, -0.15, 0.02, -0.0], [-0.18, -0.3, -0.17, -0.18]]) { c.moveTo(x0, y0); c.quadraticCurveTo(x0 + 0.025, (y0 + y1) / 2, x1, y1); }
+      c.stroke();
+      moustache(c, shade(b, -0.1));
+    } else if (k.beard === 'stubble') {
+      c.globalAlpha = 0.4;
+      c.fillStyle = b; beardPath(c, -0.12); c.fill();
+      moustache(c, b);
+      c.globalAlpha = 1;
+    } else {
+      c.fillStyle = b;
+      ell(c, 0, -0.19, 0.055, 0.045); c.fill();
+      moustache(c, b);
+    }
+    c.restore();
+  }
+  function glasses(c, k, fx) {
+    const g = k.glasses;
+    if (g === 'none') return;
+    const y = -0.33;
+    c.save();
+    c.lineCap = 'round';
+    const arms = (col) => {
+      c.strokeStyle = col;
+      c.beginPath();
+      c.moveTo(fx - 0.15, y - 0.012); c.lineTo(-0.225, y - 0.02);
+      c.moveTo(fx + 0.15, y - 0.012); c.lineTo(0.225, y - 0.02);
+      c.stroke();
+    };
+    const frames = (col, lw, wire) => {
+      c.strokeStyle = col; c.lineWidth = lw;
+      for (const s of [-1, 1]) {
+        const ex = fx + s * 0.08;
+        if (g === 'round') circ(c, ex, y, 0.058);
+        else if (g === 'oval') ell(c, ex, y, 0.066, 0.046);
+        else rrect(c, ex - 0.068, y - 0.045, 0.136, 0.088, 0.022);
+        c.stroke();
+      }
+      c.beginPath(); c.moveTo(fx - 0.018, y - 0.012); c.quadraticCurveTo(fx, y - 0.03, fx + 0.018, y - 0.012); c.stroke();
+      if (!wire) { c.fillStyle = 'rgba(200,230,255,0.12)'; for (const s of [-1, 1]) { rrect(c, fx + s * 0.08 - 0.06, y - 0.04, 0.12, 0.078, 0.02); c.fill(); } }
+    };
+    switch (g) {
+      case 'round': case 'oval': frames('#c3c7d1', 0.012, true); arms('#c3c7d1'); break;
+      case 'square': frames('#18181d', 0.022); arms('#18181d'); break;
+      case 'sporty': frames('#4a4f58', 0.022); c.lineWidth = 0.02; arms('#d63a3a'); break;
+      case 'chunky': frames('#2b211c', 0.034); c.lineWidth = 0.026; arms('#2b211c'); break;
+      case 'shades':
+        c.lineWidth = 0.02;
+        for (const s of [-1, 1]) {
+          const ex = fx + s * 0.085;
+          c.beginPath();
+          c.moveTo(ex - s * 0.07, y - 0.035);
+          c.quadraticCurveTo(ex + s * 0.02, y - 0.06, ex + s * 0.09, y - 0.07);
+          c.quadraticCurveTo(ex + s * 0.08, y + 0.05, ex, y + 0.05);
+          c.quadraticCurveTo(ex - s * 0.075, y + 0.04, ex - s * 0.07, y - 0.035);
+          c.closePath();
+          c.fillStyle = '#2c1630'; c.fill();
+          c.strokeStyle = '#0d0b10'; c.stroke();
+          c.strokeStyle = 'rgba(255,255,255,0.45)'; c.lineWidth = 0.012;
+          c.beginPath(); c.moveTo(ex - s * 0.04, y - 0.02); c.lineTo(ex - s * 0.015, y - 0.035); c.stroke();
+          c.lineWidth = 0.02;
+        }
+        c.strokeStyle = '#0d0b10';
+        c.beginPath(); c.moveTo(fx - 0.02, y - 0.02); c.lineTo(fx + 0.02, y - 0.02); c.stroke();
+        arms('#0d0b10');
+        break;
+    }
+    c.restore();
+  }
+
+  // ---------- clothes ----------
+  function torsoPath(c, k) {
+    c.beginPath();
+    if (k.body === 'dress') {
+      c.moveTo(-0.12, -0.14); c.lineTo(0.12, -0.14);
+      c.quadraticCurveTo(0.16, 0, 0.21, 0.15);
+      c.quadraticCurveTo(0, 0.21, -0.21, 0.15);
+      c.quadraticCurveTo(-0.16, 0, -0.12, -0.14);
+    } else {
+      c.moveTo(-0.13, -0.145); c.lineTo(0.13, -0.145);
+      c.quadraticCurveTo(0.168, -0.02, 0.158, 0.1);
+      c.lineTo(-0.158, 0.1);
+      c.quadraticCurveTo(-0.168, -0.02, -0.13, -0.145);
+    }
+    c.closePath();
+  }
+  function waistcoatPath(c) {
+    c.beginPath();
+    c.moveTo(-0.13, -0.145); c.lineTo(-0.035, -0.145); c.lineTo(0, -0.02); c.lineTo(0.035, -0.145); c.lineTo(0.13, -0.145);
+    c.quadraticCurveTo(0.168, -0.02, 0.158, 0.1);
+    c.lineTo(-0.158, 0.1);
+    c.quadraticCurveTo(-0.168, -0.02, -0.13, -0.145);
+    c.closePath();
+  }
+  function pattern(c, k, base, path) {
+    if (k.pattern === 'none') return;
+    c.save();
+    path();
+    c.clip();
+    const light = isLight(base);
+    switch (k.pattern) {
+      case 'flowers':
+        for (const [x, y, col] of [[-0.08, -0.07, '#ffb3d1'], [0.07, -0.09, '#ffffff'], [0.0, -0.02, '#9fd3ff'], [-0.1, 0.04, '#ffe28a'], [0.09, 0.03, '#ffb3d1'], [-0.02, 0.08, '#ffffff'], [0.13, -0.03, '#c8f7a8']]) {
+          c.fillStyle = col;
+          for (let i = 0; i < 5; i++) { const a = i * TAU / 5; circ(c, x + Math.cos(a) * 0.018, y + Math.sin(a) * 0.018, 0.013); c.fill(); }
+          c.fillStyle = '#f4c542'; circ(c, x, y, 0.009); c.fill();
+        }
+        break;
+      case 'check':
+        c.lineWidth = 0.007;
+        c.strokeStyle = light ? 'rgba(60,40,30,0.3)' : 'rgba(255,255,255,0.2)';
+        c.beginPath();
+        for (let v = -0.25; v <= 0.25; v += 0.045) { c.moveTo(v, -0.2); c.lineTo(v, 0.22); c.moveTo(-0.25, v); c.lineTo(0.25, v); }
+        c.stroke();
+        break;
+      case 'lace':
+        c.lineWidth = 0.008;
+        c.strokeStyle = light ? 'rgba(120,120,140,0.4)' : 'rgba(255,255,255,0.3)';
+        for (let yy = -0.14; yy < 0.22; yy += 0.05) for (let xx = -0.22 + ((yy * 20) % 2 ? 0.025 : 0); xx < 0.22; xx += 0.05) { circ(c, xx, yy, 0.018); c.stroke(); }
+        break;
+      case 'knit':
+        c.fillStyle = light ? 'rgba(40,40,50,0.35)' : 'rgba(255,255,255,0.4)';
+        for (let yy = -0.14, row = 0; yy < 0.2; yy += 0.032, row++) for (let xx = -0.2 + (row % 2) * 0.016; xx < 0.2; xx += 0.032) { circ(c, xx, yy, 0.008); c.fill(); }
+        break;
+    }
+    c.restore();
+  }
+  function outfit(c, k) {
+    const suit = k.body === 'suit', vest = k.body === 'waistcoat';
+    c.fillStyle = vest ? '#f4f2ee' : k.outfit;
+    torsoPath(c, k); c.fill();
+    if (!vest) pattern(c, k, k.outfit, () => torsoPath(c, k));
+    if (k.body === 'dress') {
+      c.strokeStyle = shade(k.outfit, -0.35); c.lineWidth = 0.025;
+      c.beginPath(); c.moveTo(0.205, 0.145); c.quadraticCurveTo(0, 0.205, -0.205, 0.145); c.stroke();
+    }
+    if (k.body === 'casual') {
+      c.fillStyle = shade(k.outfit, -0.25);
+      ell(c, 0, -0.142, 0.06, 0.022); c.fill();
+      c.fillRect(-0.157, 0.075, 0.314, 0.025);
+    }
+    if (suit) { c.fillStyle = '#f4f2ee'; tri(c, -0.055, -0.145, 0.055, -0.145, 0, -0.01); }
+    if ((suit || vest) && k.tie) {
+      c.fillStyle = k.tie;
+      rrect(c, -0.018, -0.145, 0.036, 0.026, 0.008); c.fill();
+      c.beginPath();
+      c.moveTo(-0.014, -0.12); c.lineTo(0.014, -0.12); c.lineTo(0.026, 0.02); c.lineTo(0, 0.05); c.lineTo(-0.026, 0.02);
+      c.closePath(); c.fill();
+    }
+    if (suit) {
+      c.fillStyle = shade(k.outfit, -0.18);
+      tri(c, -0.055, -0.145, -0.105, -0.1, -0.012, -0.03);
+      tri(c, 0.055, -0.145, 0.105, -0.1, 0.012, -0.03);
+      c.fillStyle = shade(k.outfit, -0.45); circ(c, 0, 0.045, 0.012); c.fill();
+    }
+    if (vest) {
+      c.fillStyle = k.outfit; waistcoatPath(c); c.fill();
+      pattern(c, k, k.outfit, () => waistcoatPath(c));
+      c.fillStyle = shade(k.outfit, -0.45);
+      for (const yy of [0.0, 0.035, 0.07]) { circ(c, 0, yy, 0.011); c.fill(); }
+    }
     switch (k.costume) {
       case 'witch':
         c.fillStyle = '#231a2e'; c.fillRect(-0.14, -0.03, 0.28, 0.045);
@@ -235,21 +547,28 @@ const Art = (() => {
         break;
       case 'princess':
         c.fillStyle = 'rgba(255,255,255,0.9)';
-        for (let i = -2; i <= 2; i++) { circ(c, i * 0.075, 0.165 - Math.abs(i) * 0.008, 0.022); c.fill(); }
+        if (k.body === 'dress') for (let i = -2; i <= 2; i++) { circ(c, i * 0.075, 0.165 - Math.abs(i) * 0.008, 0.022); c.fill(); }
         c.fillStyle = '#7df9ff'; circ(c, 0, -0.08, 0.03); c.fill();
         break;
       case 'vampire':
-        c.fillStyle = '#b3122a'; tri(c, -0.07, -0.14, 0, 0.0, 0.07, -0.14);
+        if (!suit && !vest) { c.fillStyle = '#b3122a'; tri(c, -0.07, -0.14, 0, 0.0, 0.07, -0.14); }
         break;
       case 'fairy':
         c.fillStyle = 'rgba(255,255,255,0.85)';
         for (const [sx, sy] of [[-0.1, 0.05], [0.08, 0.1], [0.02, -0.05], [-0.05, 0.12], [0.12, 0.0]]) { circ(c, sx, sy, 0.016); c.fill(); }
         break;
       case 'cat':
-        c.fillStyle = 'rgba(255,255,255,0.75)'; ell(c, 0, 0.04, 0.07, 0.09); c.fill();
+        if (!suit && !vest) { c.fillStyle = 'rgba(255,255,255,0.75)'; ell(c, 0, 0.04, 0.07, 0.09); c.fill(); }
         break;
     }
+    if (k.necklace) {
+      c.strokeStyle = k.necklace; c.lineWidth = 0.01;
+      c.beginPath(); c.arc(0, -0.2, 0.11, 0.47, Math.PI - 0.47); c.stroke();
+      c.fillStyle = k.necklace; circ(c, 0, -0.085, 0.017); c.fill();
+    }
   }
+
+  // ---------- costumes ----------
   function fairyWings(c, t) {
     const f = 0.85 + Math.sin(t * 18) * 0.15;
     c.fillStyle = 'rgba(180,240,255,0.55)';
@@ -313,6 +632,27 @@ const Art = (() => {
         for (let i = 0; i < 5; i++) { const a = i * TAU / 5; circ(c, 0.15 + Math.cos(a) * 0.04, -0.52 + Math.sin(a) * 0.04, 0.032); c.fill(); }
         c.fillStyle = '#ffe14d'; circ(c, 0.15, -0.52, 0.025); c.fill();
         break;
+    }
+  }
+  function hat(c, k) {
+    if (k.hat === 'cap') {
+      c.fillStyle = '#1f1f25';
+      ell(c, 0, -0.475, 0.255, 0.125); c.fill();
+      c.fillStyle = '#2c2c34';
+      ell(c, 0, -0.405, 0.245, 0.055); c.fill();
+      c.strokeStyle = 'rgba(255,255,255,0.08)'; c.lineWidth = 0.01;
+      c.beginPath(); c.moveTo(-0.2, -0.47); c.quadraticCurveTo(0, -0.56, 0.2, -0.47); c.stroke();
+      c.fillStyle = '#2c2c34'; circ(c, 0, -0.595, 0.018); c.fill();
+    } else if (k.hat === 'flowers') {
+      for (let i = -3; i <= 3; i++) {
+        const x = i * 0.068, y = -0.505 + i * i * 0.005;
+        c.fillStyle = '#fbfbf7';
+        for (let p = 0; p < 5; p++) { const a = p * TAU / 5; circ(c, x + Math.cos(a) * 0.022, y + Math.sin(a) * 0.022, 0.018); c.fill(); }
+        c.fillStyle = '#f3e7a3'; circ(c, x, y, 0.012); c.fill();
+      }
+      c.strokeStyle = 'rgba(255,255,255,0.85)'; c.lineWidth = 0.008;
+      c.beginPath(); c.moveTo(0, -0.49); c.lineTo(0, -0.44); c.stroke();
+      c.fillStyle = '#ffffff'; circ(c, 0, -0.435, 0.012); c.fill();
     }
   }
   function dizzyStars(c, t) {
@@ -444,7 +784,8 @@ const Art = (() => {
     glow.addColorStop(0, o.hunting ? 'rgba(90,220,255,0.3)' : 'rgba(110,70,170,0.3)');
     glow.addColorStop(1, 'rgba(110,70,170,0)');
     c.fillStyle = glow; circ(c, 0, 0, 0.8); c.fill();
-    c.globalAlpha = 0.88;
+    const a0 = c.globalAlpha;
+    c.globalAlpha = a0 * 0.88;
     const body = c.createLinearGradient(0, -0.6, 0, 0.4);
     body.addColorStop(0, '#3d2c5c'); body.addColorStop(1, 'rgba(25,15,40,0.6)');
     c.fillStyle = body;
@@ -460,7 +801,7 @@ const Art = (() => {
       c.lineTo(x0 - 0.136, 0.32);
     }
     c.closePath(); c.fill();
-    c.globalAlpha = 1;
+    c.globalAlpha = a0;
     const lx = (o.look || 0) * 0.04;
     c.fillStyle = '#05030a'; ell(c, lx, -0.2, 0.17, 0.2); c.fill();
     c.fillStyle = o.hunting ? '#7ff6ff' : '#9a8cd0';
@@ -883,11 +1224,62 @@ const Art = (() => {
     }
   }
 
+
+  // =====================================================================
+  //  MULTIPLAYER BITS
+  // =====================================================================
+  // A glowing ghost cage around a caught player; progress = how far a friend is with freeing them (0..1)
+  function cage(c, x, y, t, progress) {
+    c.save();
+    c.translate(x, y);
+    const g = c.createRadialGradient(0, -0.2, 0.05, 0, -0.2, 0.7);
+    g.addColorStop(0, 'rgba(150,120,255,0.35)'); g.addColorStop(1, 'rgba(150,120,255,0)');
+    c.fillStyle = g; circ(c, 0, -0.2, 0.7); c.fill();
+    c.strokeStyle = 'rgba(190,170,255,0.9)'; c.lineWidth = 0.035; c.lineCap = 'round';
+    c.beginPath();
+    for (let i = 0; i < 6; i++) { const bx = -0.3 + i * 0.12; c.moveTo(bx, 0.3); c.lineTo(bx, -0.55 + Math.abs(bx) * 0.25); }
+    c.stroke();
+    c.beginPath(); c.ellipse(0, -0.52, 0.32, 0.1, 0, 0, TAU); c.stroke();
+    c.beginPath(); c.ellipse(0, 0.3, 0.32, 0.08, 0, 0, TAU); c.stroke();
+    text(c, '🔒', 0, -0.7, 0.24, '#fff');
+    if (progress > 0) {
+      c.strokeStyle = '#7dff9e'; c.lineWidth = 0.07;
+      c.beginPath(); c.arc(0, -0.15, 0.55, -Math.PI / 2, -Math.PI / 2 + progress * TAU); c.stroke();
+    }
+    c.restore();
+  }
+  function nameTag(c, str, x, y, color) {
+    c.save();
+    c.translate(x, y);
+    c.font = `bold 40px ${FONT}`;
+    const w = Math.min(4, c.measureText(str).width / 40 * 0.22 + 0.16);
+    c.fillStyle = 'rgba(15,6,28,0.7)';
+    rrect(c, -w / 2, -0.13, w, 0.26, 0.1); c.fill();
+    c.restore();
+    text(c, str, x, y, 0.2, color || '#fff');
+  }
+  // What a phantom player senses: a smudge of smoke where a human is
+  function smoke(c, x, y, t) {
+    for (let i = 0; i < 3; i++) {
+      const r = 0.25 + ((t * 0.8 + i / 3) % 1) * 0.5;
+      c.strokeStyle = `rgba(150,240,255,${0.6 * (1 - ((t * 0.8 + i / 3) % 1))})`;
+      c.lineWidth = 0.05;
+      circ(c, x, y, r); c.stroke();
+    }
+    c.fillStyle = 'rgba(150,240,255,0.5)'; circ(c, x, y, 0.1); c.fill();
+  }
+  function emoteBubble(c, x, y, icon, pxPerUnit) {
+    c.fillStyle = 'rgba(255,255,255,0.95)';
+    rrect(c, x - 0.24, y - 0.24, 0.48, 0.44, 0.14); c.fill();
+    tri(c, x - 0.07, y + 0.19, x + 0.07, y + 0.19, x, y + 0.32);
+    emoji(c, icon, x, y - 0.02, 0.34, pxPerUnit);
+  }
+
   return {
-    SKINS, HAIRS, OUTFITS, HAIR_STYLES, COSTUMES, FONT,
+    SKINS, HAIRS, OUTFITS, BOTTOMS, TIES, EYES, NECKLACES, HAIR_STYLES, HAIR_LABELS, BODIES, PATTERNS, GLASSES, BEARDS, HATS, COSTUMES, FONT,
     circle: circ, roundRect: rrect, text, emoji, rng, shade,
     hero, ghost, banshee, phantom, meter, bubble, bat, batEyes, hand, dirt,
     bush, coffin, crypt, gate, sparkle, pumpkin, tomb,
-    paintMap,
+    paintMap, cage, nameTag, smoke, emoteBubble,
   };
 })();

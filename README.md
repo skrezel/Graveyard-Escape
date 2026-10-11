@@ -59,6 +59,45 @@ You have 3 hearts per level.
 5. **The Crypts:** a maze with a phantom that floats through walls
 6. **Midnight Escape:** everything at once, with a ghost guarding the gate
 
+## Multiplayer 👥
+
+Play on your own phones, at home or anywhere. On the title screen tap **Multiplayer**:
+
+- **Create a game:** you become the host and get a 4-letter room code.
+- **Join:** type the host's code. Up to 8 players.
+
+The host picks the game and the map. Everyone picks a team and a role in the lobby, where
+the full rules for the chosen game are listed.
+
+| Game | How it works |
+|---|---|
+| 🤝 **Escape Together** | Everyone is a human against the computer ghosts. Keys count for the whole team. Caught players are locked in a ghost cage until a friend stands next to it for 2 seconds. You win when everyone who isn't caged has escaped. |
+| ⚔️ **Ghosts vs Humans** | One team plays the ghosts! Humans win if at least half of them escape before midnight (6 minutes). Ghosts win if every human is caged at once, or when the clock strikes midnight. The host can add computer ghosts too. |
+
+**Human roles:** 🏃 Runner (longer sprint) · 🤫 Sneaker (quieter, faster sneaking) · 🪨 Trickster (more pebbles, throws further) · ⛑️ Medic (frees friends in 1 second).
+
+**Ghost roles:**
+- 👻 **Ghost:** sees in a cone and floats fast. LUNGE dashes.
+- 😱 **Banshee:** blind, but sees every noise on the map. SCREAM shows nearby humans to the whole ghost team.
+- 🌫️ **Phantom:** floats through walls and senses nearby humans. FADE turns it invisible to humans.
+
+All ghosts catch by touch and can CHECK a hiding spot (a wrong guess makes them dizzy). A ghost
+that *saw* someone hide gets a 👀 marker on that spot. There's no free-text chat, only four quick
+emotes (🆘 📍 👻 🏃) that only your own team sees.
+
+**How it works:** the host's phone runs the game. A tiny relay on Cloudflare (`server/`) just
+forwards messages between the phones in a room. Nothing is stored, and a room disappears when
+everyone leaves. To change the relay, run `cd server && npx wrangler deploy`. To test multiplayer
+on the Mac without the internet, run `cd server && npm run dev` and open the game from
+`http://localhost:8080`, which then uses that local relay.
+
+## Characters 🎭
+
+**My Character** has ready-made characters at the top: our family (with made-up nicknames,
+so rename them in `js/characters.js`) plus a few spooky extras and a 🎲 random button. Then change
+anything: costume, hat, clothes, colours and patterns, tie, hairstyle, hair and eye colour,
+glasses, beard, skin and necklace.
+
 ## Design your own levels together
 
 Open `js/levels.js`. Each level is a map drawn with letters:
@@ -94,6 +133,10 @@ for testing.
 | `index.html` | The page and the menu screens |
 | `css/style.css` | How the menus look |
 | `js/levels.js` | **The maps (edit me!)** |
+| `js/characters.js` | **Ready-made characters (rename them!)** |
+| `js/rules.js` | **Multiplayer rules and role descriptions** |
+| `js/net.js` | Multiplayer connection to the relay |
+| `server/` | The multiplayer relay (Cloudflare Worker) |
 | `js/game.js` | The game: movement, ghosts, hiding, hazards, screens |
 | `js/art.js` | All the drawings: the hero, ghosts, tombstones, pumpkins… |
 | `js/audio.js` | Music and sound effects |

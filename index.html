@@ -22,12 +22,15 @@
   <div id="hud" class="hidden">
     <span id="hearts" class="pill"></span>
     <span class="pill"><span id="keys"></span>&nbsp;&nbsp;<span id="candy"></span></span>
+    <span id="clock" class="pill hidden"></span>
     <button id="pauseBtn" class="icon-btn" aria-label="Pause">⏸</button>
   </div>
   <div id="controls" class="hidden">
     <button id="hideBtn" class="ctl hidden">🙈<br>HIDE</button>
     <button id="throwBtn" class="ctl">🪨<br><span id="pebbleCount">2</span></button>
     <button id="sprintBtn" class="ctl">⚡<br>SPRINT</button>
+    <button id="emoteBtn" class="ctl hidden">💬</button>
+    <div id="emotes" class="hidden"></div>
   </div>
   <div id="toast" class="hidden"></div>
 
@@ -38,6 +41,7 @@
     <canvas id="titleHero" class="title-hero"></canvas>
     <p class="tagline">Run! Dodge! Hide!</p>
     <button id="playBtn" class="big">▶ Play</button>
+    <button id="mpBtn" class="big mp">👥 Multiplayer</button>
     <div class="row">
       <button id="dressBtn" class="secondary">👗 My Character</button>
       <button id="howBtn" class="secondary">❓ How to Play</button>
@@ -47,15 +51,15 @@
 
   <!-- character maker -->
   <section id="creator" class="screen hidden">
-    <h2>Make Your Character</h2>
-    <canvas id="heroPreview" class="hero-preview"></canvas>
-    <input id="heroName" maxlength="12" placeholder="Type your name" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false">
-    <div class="opt"><span>Costume</span><div id="optCostume" class="choices"></div></div>
-    <div class="opt"><span>Hair</span><div id="optHair" class="choices"></div></div>
-    <div class="opt"><span>Style</span><div id="optStyle" class="choices"></div></div>
-    <div class="opt"><span>Skin</span><div id="optSkin" class="choices"></div></div>
-    <div class="opt"><span>Outfit</span><div id="optOutfit" class="choices"></div></div>
-    <button id="creatorDone" class="big">✓ Done</button>
+    <div class="creator-top">
+      <h2>Make Your Character</h2>
+      <canvas id="heroPreview" class="hero-preview"></canvas>
+      <input id="heroName" maxlength="12" placeholder="Type your name" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false">
+    </div>
+    <p class="sub">Pick a ready-made character, then change anything you like:</p>
+    <div id="presets" class="presets"></div>
+    <div id="creatorRows" class="creator-rows"></div>
+    <button id="creatorDone" class="big sticky-done">✓ Done</button>
   </section>
 
   <!-- level select -->
@@ -80,6 +84,7 @@
       <li><b>🌫️</b> Phantoms float through walls and sense you nearby. They're slow, so keep moving</li>
       <li><b>🗺️</b> Your map (top right) shows where you've been. Tap it to make it bigger</li>
       <li><b>⭐</b> Stars: escape · get all the candy · never get spotted</li>
+      <li><b>👥</b> Multiplayer: escape together, or one team plays the ghosts! The rules are in the lobby</li>
       <li class="keys-help"><b>⌨️</b> Computer: arrows/WASD · hold X sneak · Shift sprint · Space hide · F throw · M map</li>
     </ul>
     <button id="howBack" class="big">Got it!</button>
@@ -125,9 +130,64 @@
     <button id="loseMenuBtn" class="secondary">🏠 Menu</button>
   </section>
 
+  <!-- multiplayer -->
+  <section id="mpMenu" class="screen hidden">
+    <h2>👥 Multiplayer</h2>
+    <p class="sub">Play together on your own phones, at home or anywhere.</p>
+    <button id="mpCreate" class="big">✨ Create a game</button>
+    <p class="sub">or join a friend's game:</p>
+    <div class="join-row">
+      <input id="mpCode" maxlength="4" placeholder="CODE" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+      <button id="mpJoin">Join</button>
+    </div>
+    <p id="mpStatus" class="warn hidden"></p>
+    <button id="mpBack" class="secondary">← Back</button>
+  </section>
+
+  <section id="lobby" class="screen hidden">
+    <div class="room-code">Room code <b id="lobbyCode">----</b></div>
+    <p class="sub">Friends tap Multiplayer, then type this code.</p>
+    <div id="lobbyOpts" class="lobby-opts"></div>
+    <p id="lobbyModeText" class="tip"></p>
+    <div class="lobby-box">
+      <h3>You</h3>
+      <div id="lobbyTeam" class="choices"></div>
+      <div id="lobbyRole" class="choices"></div>
+      <p id="lobbyRoleText" class="role-text"></p>
+    </div>
+    <div class="lobby-box">
+      <h3>Players</h3>
+      <ul id="lobbyPlayers" class="player-list"></ul>
+    </div>
+    <details class="rules"><summary>📜 Rules</summary><ul id="lobbyRules"></ul></details>
+    <button id="lobbyStart" class="big">▶ Start</button>
+    <p id="lobbyWait" class="sub"></p>
+    <button id="lobbyLeave" class="secondary">Leave</button>
+  </section>
+
+  <section id="results" class="screen hidden">
+    <h2 id="resTitle"></h2>
+    <p id="resText"></p>
+    <ul id="resPlayers" class="player-list"></ul>
+    <button id="resLobby" class="big">↻ Back to the lobby</button>
+    <button id="resLeave" class="secondary">Leave</button>
+  </section>
+
+  <section id="mpPause" class="screen hidden">
+    <h2>Game menu</h2>
+    <p class="sub">The game keeps going for everyone else!</p>
+    <button id="mpResume" class="big">▶ Back to the game</button>
+    <button id="mpRulesBtn" class="secondary">📜 Rules</button>
+    <ul id="mpPauseRules" class="how-list rules-list hidden"></ul>
+    <button id="mpQuit" class="secondary">🚪 Leave the game</button>
+  </section>
+
   <script src="js/levels.js"></script>
   <script src="js/art.js"></script>
   <script src="js/audio.js"></script>
+  <script src="js/characters.js"></script>
+  <script src="js/rules.js"></script>
+  <script src="js/net.js"></script>
   <script src="js/game.js"></script>
 </body>
 </html>
